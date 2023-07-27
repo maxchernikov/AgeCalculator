@@ -48,15 +48,14 @@ def main():
     ageDay = calcAgeDay(birthDay, currentDay)           #Calculate age in days left over after ageMonth calculation
     
     
-    ageYear = yearAdjust(ageYear, ageMonth)
+    ageYear = yearAdjust(ageYear, ageMonth)             #Adjust for bad math
 
-    ageMonth = monthAdjust(ageMonth)
+    ageMonth = monthAdjust(ageMonth)                    #Adjust for bad math
     
-    printOutputs(ageYear, ageMonth, ageDay)
+    ageDay = daysAdjust(birthYear, currentYear, ageDay, birthMonth, currentMonth, currentDay)  #Adjust for leap days
     
-#-------------------------------------------------------------------------------
-#Testing Variable inputs
-#    pprint(locals())                                      # REMOVE ME WHEN PROJ COMPLETE
+    printOutputs(ageYear, ageMonth, ageDay)             #Print outputs
+    
 #-------------------------------------------------------------------------------
 
 def getBirthDate(time_unit):
@@ -105,6 +104,16 @@ def monthAdjust(age_month):
     else:
         return age_month
     
+#-------------------------------------------------------------------------------
+    
+def daysAdjust(birth_year, current_year, days_old, b_month, c_month, c_day):
+    leap_days = 0
+    leap_days = calendar.leapdays(birth_year,current_year)
+    days_old = leap_days + days_old
+    if b_month > 2 or (c_month > 3 and c_day != 29):
+        days_old -= 1
+    return days_old
+
 #-------------------------------------------------------------------------------
 
 def printOutputs(yr, mnth, day):
