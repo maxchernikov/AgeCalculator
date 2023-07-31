@@ -4,72 +4,64 @@
 #Title: Age Calculator
 #Inputs: Birth date and current date
 #Process: Calculate age
-#Outputs: Age in years, months, weeks, and days
+#Outputs: Age in years, months, and days
 #-------------------------------------------------------------------------------
 
-import calendar
-                                           #Import necessary modules
-from pprint import pprint
+# Import necessary module(s)
+import calendar                 
+
+# Enumerate the amount of age measurements the calculator outputs (e.g. Years, months, and days is 3 age measurements)
+TIME_UNITS = 3        
 
 #-------------------------------------------------------------------------------
 def main():
     
-    birthMonth = 0
-    birthDay = 0
-    birthYear = 0
+    birthDateList = []
     
-    currentMonth = 0                                                                   
-    currentDay = 0
-    currentYear = 0                        #Initialize variables
-    ageYear = 0
+    currentDateList = []                         
     
-    ageMonth = 0
-    ageDay = 0
-    
-    
-    birthMonth = getBirthDate("month")           #Prompt input of birth month
-    
-    birthDay = getBirthDate("day")           #Prompt input of birth day
-    
-    birthYear = getBirthDate("year")           #Prompt input of birth year
-    
-    
-    currentMonth = getCurrentDate("month")           #Prompt input of current month
-    
-    currentDay = getCurrentDate("day")           #Prompt input of current month
-    
-    currentYear = getCurrentDate("year")           #Prompt input of current month
-    
-    
-    ageYear = calcAge(birthYear, currentYear)           #Calculate age in years   
-    
-    ageMonth = calcAge(birthMonth, currentMonth)           #Calculate age in months left over after ageYear calculation
-    
-    ageDay = calcAgeDay(birthDay, currentDay)           #Calculate age in days left over after ageMonth calculation
-    
-    
-    ageYear = yearAdjust(ageYear, ageMonth)             #Adjust for bad math
+    ageList = []
 
-    ageMonth = monthAdjust(ageMonth)                    #Adjust for bad math
+    accumulator = 0
     
-    ageDay = daysAdjust(birthYear, currentYear, ageDay, birthMonth, currentMonth, currentDay)  #Adjust for leap days
+    # Populate list with user input birth date in MM/DD/YYYY format
+    birthDateList = getBirthDate()
+
+    # Populate list with user input current date in MM/DD/YYYY format
+    currentDateList = getCurrentDate()
     
-    printOutputs(ageYear, ageMonth, ageDay)             #Print outputs
+    # Loop that calculates age in years, months, and days and appends date into a list
+    while accumulator < TIME_UNITS:
+        age = calcAge(birthDateList[accumulator],currentDateList[accumulator])
+        ageList.append(age)                            
+        accumulator +=1
+    
+    # Adjust years for cases where users birthday is coming up in the current year 
+    ageList[2] = yearAdjust(ageList[2], ageList[0])    
+
+    # Adjust months to ensure no negative numbers
+    ageList[0] = monthAdjust(ageList[0])
+    
+    # Adjust for leap days and add them to days old
+    ageList[1] = daysAdjust(birthDateList[1], birthDateList[2], currentDateList[1], currentDateList[2], ageList[1])  
+    
+    # Print user age in years, months, and days #UPDATE WHEN ADDING MORE TIME UNITS IN FUTURE#
+    printOutputs(ageList[0],ageList[1],ageList[2])            
     
 #-------------------------------------------------------------------------------
 
-def getBirthDate(time_unit):
-    birth_date = int
-    
-    birth_date = int(input("Input birth " + time_unit +": "))
+def getBirthDate():
+    birth_date = []
+    birth_date = [int(x) for x in input("Enter birth date (e.g. mm/dd/yyyy): ").split("/")]
     return birth_date
 
 #-------------------------------------------------------------------------------
 
-def getCurrentDate(time_unit):
-    current_date = int
-    
-    current_date = int(input("Input current " + time_unit +": "))
+#todo improve user prompts? 
+def getCurrentDate():
+    current_date = []
+    print()
+    current_date = [int(x) for x in input("Enter current date (e.g. mm/dd/yyyy): ").split("/")]
     return current_date
 
 #-------------------------------------------------------------------------------
@@ -77,17 +69,11 @@ def getCurrentDate(time_unit):
 def calcAge(birth_int, current_int):
     age = 0
     age = current_int - birth_int
-    return age
-
-#-------------------------------------------------------------------------------
-
-def calcAgeDay(birth_day, current_day):
-    days_old = 0
-    days_old = current_day - birth_day
-    return days_old
+    return age   
     
 #-------------------------------------------------------------------------------
 
+# Adjust years for cases where users birthday is coming up in the current year 
 def yearAdjust(age_year, age_month):
     if age_month < 0:
         age_year -=1
@@ -97,30 +83,47 @@ def yearAdjust(age_year, age_month):
 
 #-------------------------------------------------------------------------------
 
+# Adjust months to ensure no negative numbers
 def monthAdjust(age_month):
     if age_month < 0:
-        age_month = age_month + 12
+        age_month += 12
         return age_month
     else:
         return age_month
     
 #-------------------------------------------------------------------------------
-    
-def daysAdjust(birth_year, current_year, days_old, b_month, c_month, c_day):
+
+# Adjust for leap days and add them to days old
+def daysAdjust(birth_month, birth_year, current_month, current_year, days_old):
     leap_days = 0
     leap_days = calendar.leapdays(birth_year,current_year)
-    days_old = leap_days + days_old
-    if b_month > 2 or (c_month > 3 and c_day != 29):
-        days_old -= 1
+    days_old += leap_days
+    if leap_days > 0:
+        if birth_month > 2 or (current_month > 3):
+            days_old -= 1
     return days_old
 
 #-------------------------------------------------------------------------------
 
-def printOutputs(yr, mnth, day):
-    output = f" You are {yr} year(s), {mnth} month(s), and {day} day(s) old"
-    print(output)
+#todo add more time units (eg weeks)
+def printOutputs(mnth, day, yr):
+    print()
+    age_output = ""
+    
+    if yr > 0:
+        age_output += f"{yr} year(s)"
+    
+    if mnth > 0:
+        age_output += f" {mnth} month(s)"
+        
+    if day > 0:
+        age_output += f" {day} day(s)"
+        
+    print (age_output)
+    
 #-------------------------------------------------------------------------------
 
 main()
+
 
 
